@@ -1,5 +1,5 @@
 {
-    "name": "Mnist_LeNet",
+    "name": "4Mula",
     "n_gpu": 1,
     "arch": {"type": "ShortChunkCNN", "args": {}},
     "data_loader": {
@@ -11,12 +11,12 @@
             "x_size": 200,
             "y_size": 128,
             "sampling": "random",
-            "param_sampling": 1,
-        },
+            "param_sampling": 1
+        }
     },
     "optimizer": {
         "type": "Adam",
-        "args": {"lr": 0.001, "weight_decay": 0, "amsgrad": true},
+        "args": {"lr": 0.001, "weight_decay": 0, "amsgrad": true}
     },
     "loss": "bce_loss",
     "metrics": [],
@@ -28,6 +28,6 @@
         "verbosity": 2,
         "monitor": "min val_loss",
         "early_stop": 10,
-        "tensorboard": true,
-    },
+        "tensorboard": true
+    }
 }

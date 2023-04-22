@@ -77,7 +77,6 @@ def data_generator(id, audio_repr_path, gt, pack):
             last_frame = int(audio_rep.shape[0]) - int(shape[0]) + 1
             for time_stamp in range(0, last_frame, param_sampling):
                 representation = audio_rep[time_stamp : time_stamp + shape[0], :]
-                representation = representation.flatten()
                 yield {
                     "X": representation,
                     "Y": gt,
