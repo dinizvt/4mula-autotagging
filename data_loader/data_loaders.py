@@ -87,10 +87,20 @@ def data_generator(id, audio_repr_path, gt, pack):
         print('"{}" not found'.format(audio_repr_path))
 
 
-class StreamerLEN (pescador.ZMQStreamer):
-    def __init__(self, streamer, min_port=49152, max_port=65535, max_tries=100, copy=False, timeout=5, data_len=None, batch_size=None):
+class StreamerLEN(pescador.ZMQStreamer):
+    def __init__(
+        self,
+        streamer,
+        min_port=49152,
+        max_port=65535,
+        max_tries=100,
+        copy=False,
+        timeout=5,
+        data_len=None,
+        batch_size=None,
+    ):
         super().__init__(streamer, min_port, max_port, max_tries, copy, timeout)
-        self.batch_size=batch_size
+        self.batch_size = batch_size
         self.data_len = data_len
 
     def __len__(self):
@@ -127,8 +137,10 @@ def FourMuLaDataloader(
         buffer_size=batch_size,
         partial=True,
     )
-    n_batches_train = int(np.ceil((len(train_streams)) / batch_size))*param_sampling
-    train_batch_streamer = StreamerLEN(train_batch_streamer, data_len=n_batches_train, batch_size=batch_size)
+    n_batches_train = int(np.ceil((len(train_streams)) / batch_size)) * param_sampling
+    train_batch_streamer = StreamerLEN(
+        train_batch_streamer, data_len=n_batches_train, batch_size=batch_size
+    )
 
     val_pack = ((x_size, y_size), data_dir, "overlap_sampling", x_size)
     val_streams = [
@@ -144,6 +156,8 @@ def FourMuLaDataloader(
         buffer_size=val_batch_size,
         partial=True,
     )
-    n_batches_val = int(np.ceil((len(val_streams)) / batch_size))*x_size
-    val_batch_streamer = StreamerLEN(val_batch_streamer, n_batches_val, batch_size=batch_size)
+    n_batches_val = int(np.ceil((len(val_streams)) / batch_size)) * x_size
+    val_batch_streamer = StreamerLEN(
+        val_batch_streamer, n_batches_val, batch_size=batch_size
+    )
     return train_batch_streamer, val_batch_streamer
