@@ -1,22 +1,61 @@
 import torch.nn as nn
-import torch.nn.functional as F
+from model.modules import Conv_2d
 from base import BaseModel
 
 
-class MnistModel(BaseModel):
-    def __init__(self, num_classes=10):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
-        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-        self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(320, 50)
-        self.fc2 = nn.Linear(50, num_classes)
+class ShortChunkCNN(BaseModel):
+    """
+    Short-chunk CNN architecture adapted to melspectrogram input input.
+    So-called vgg-ish model with a small receptive field.
+    Deeper layers, smaller pooling (2x2).
+    """
+
+    def __init__(self, n_channels=128, n_class=50):
+        super(ShortChunkCNN, self).__init__()
+
+        self.spec_bn = nn.BatchNorm2d(1)
+
+        # CNN
+        self.layer1 = Conv_2d(1, n_channels, pooling=2)
+        self.layer2 = Conv_2d(n_channels, n_channels, pooling=2)
+        self.layer3 = Conv_2d(n_channels, n_channels * 2, pooling=2)
+        self.layer4 = Conv_2d(n_channels * 2, n_channels * 2, pooling=2)
+        self.layer5 = Conv_2d(n_channels * 2, n_channels * 2, pooling=2)
+        self.layer6 = Conv_2d(n_channels * 2, n_channels * 2, pooling=2)
+        self.layer7 = Conv_2d(n_channels * 2, n_channels * 4, pooling=2)
+
+        # Dense
+        self.dense1 = nn.Linear(n_channels * 4, n_channels * 4)
+        self.bn = nn.BatchNorm1d(n_channels * 4)
+        self.dense2 = nn.Linear(n_channels * 4, n_class)
+        self.dropout = nn.Dropout(0.5)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 320)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
-        x = self.fc2(x)
-        return F.log_softmax(x, dim=1)
+        x = x.unsqueeze(1)
+        x = self.spec_bn(x)
+
+        # CNN
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        x = self.layer6(x)
+        x = self.layer7(x)
+        x = x.squeeze(2)
+
+        # Global Max Pooling
+        if x.size(-1) != 1:
+            x = nn.MaxPool1d(x.size(-1))(x)
+        x = x.squeeze(2)
+
+        # Dense
+        x = self.dense1(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.dense2(x)
+        x = nn.Sigmoid()(x)
+
+        return x

@@ -3,17 +3,19 @@
     "n_gpu": 1,
 
     "arch": {
-        "type": "MnistModel",
+        "type": "ShortChunkCNN",
         "args": {}
     },
     "data_loader": {
-        "type": "MnistDataLoader",
+        "type": "FourMuLaDataloader",
         "args":{
-            "data_dir": "data/",
-            "batch_size": 128,
-            "shuffle": true,
-            "validation_split": 0.1,
-            "num_workers": 2
+            "data_dir": "data/4mula/",
+            "batch_size": 32,
+            "val_batch_size": 128,
+            "x_size": 200,
+            "y_size": 128,
+            "sampling": "random",
+            "param_sampling": 1
         }
     },
     "optimizer": {
@@ -24,9 +26,8 @@
             "amsgrad": true
         }
     },
-    "loss": "nll_loss",
+    "loss": "bce_loss",
     "metrics": [
-        "accuracy", "top_k_acc"
     ],
     "lr_scheduler": {
         "type": "StepLR",

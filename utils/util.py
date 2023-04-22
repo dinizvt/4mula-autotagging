@@ -4,7 +4,28 @@ import pandas as pd
 from pathlib import Path
 from itertools import repeat
 from collections import OrderedDict
+from ast import literal_eval
 
+
+def load_id2gt(gt_file):
+    ids = []
+    fgt = open(gt_file)
+    id2gt = dict()
+    for line in fgt.readlines():
+        id, gt = line.strip().split("\t")  # id is string
+        id2gt[id] = literal_eval(gt)  # gt is array
+        ids.append(id)
+    return ids, id2gt
+
+def load_id2path(index_file):
+    paths = []
+    fspec = open(index_file)
+    id2path = dict()
+    for line in fspec.readlines():
+        id, path = line.strip().split("\t")
+        id2path[id] = path
+        paths.append(path)
+    return paths, id2path
 
 def ensure_dir(dirname):
     dirname = Path(dirname)
