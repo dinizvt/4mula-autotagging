@@ -106,7 +106,7 @@ class Trainer(BaseTrainer):
         self.model.eval()
         self.valid_metrics.reset()
         with torch.no_grad():
-            for batch_idx, batch in tqdm(enumerate(self.valid_data_loader)):
+            for batch_idx, batch in tqdm(enumerate(self.valid_data_loader), total=len(self.valid_data_loader)):
                 data = torch.Tensor(batch["X"])
                 target = torch.Tensor(batch["Y"])
                 data, target = data.to(self.device), target.to(self.device)

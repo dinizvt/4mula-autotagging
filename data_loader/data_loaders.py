@@ -157,6 +157,6 @@ def FourMuLaDataloader(
     )
     n_batches_val = int(np.ceil((len(val_streams)) / batch_size)) * x_size
     val_batch_streamer = StreamerLEN(
-        val_batch_streamer, n_batches_val, batch_size=batch_size
+        val_batch_streamer, data_len=n_batches_val, batch_size=batch_size
     )
     return train_batch_streamer, val_batch_streamer
